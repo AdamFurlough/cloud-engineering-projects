@@ -2,10 +2,10 @@
 Reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends to opensearch
 
 ## LINKS
-- https://docs.aws.amazon.com/opensearch-service/latest/developerguide/integrations.html#integrations-s3-lambda
-- boto3 has good documentation: boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-- https://urllib3.readthedocs.io/en/stable/v2-migration-guide.html#importerror-cannot-import-name-default-ciphers-from-urllib3-util-ssl
-- https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3
+- [AWS Tutorial I adapted](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/integrations.html#integrations-s3-lambda)
+- [boto3 documentation](boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)
+- [urllib3 error](https://urllib3.readthedocs.io/en/stable/v2-migration-guide.html#importerror-cannot-import-name-default-ciphers-from-urllib3-util-ssl)
+- [s3 obj with boto3 error stackoverflow](https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3)
 
 ## NOTES
 - needs to create the function with an ENI inside the VPC containing OpenSearch domain
