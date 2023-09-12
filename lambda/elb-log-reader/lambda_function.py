@@ -4,17 +4,17 @@ import requests
 import gzip
 from requests_aws4auth import AWS4Auth
 from botocore.response import StreamingBody
+from datetime import datetime
 
 region = 'us-gov-west-1'
 service = 'es'
 credentials = boto3.Session().get_credentials()
 awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
-
-host = 'https://add_opensearch_domain_here.us-west-1.es.amazonaws.com' # the OpenSearch Service domain
-index = 'my-elb-logs'
+host = 'https://opensearch-domain.us-west-1.es.amazonaws.com' # the OpenSearch Service domain
+current_date = datetime.now().strftime('%Y-%m-%d')
+index = f'my-index-{current_date}'
 datatype = '_doc'
 url = host + '/' + index + '/' + datatype
-
 headers = { "Content-Type": "application/json" }
 
 # create a client object for s3 using boto
@@ -64,8 +64,17 @@ def lambda_handler(event, context):
 
                 if elb_match:
                     document = elb_match.groupdict()
-                    print("Successfully unzipped the log file, matched the regular expressions to each line, and indexed the JSON")
                     
+                    # Explicitly convert certain fields from strings to integers or floats as needed
+                    document['request_processing_time'] = float(document['request_processing_time'])
+                    document['backend_processing_time'] = float(document['backend_processing_time'])
+                    document['response_processing_time'] = float(document['response_processing_time'])
+                    document['elb_status_code'] = int(document['elb_status_code'])
+                    document['backend_status_code'] = int(document['backend_status_code'])
+                    document['received_bytes'] = int(document['received_bytes'])
+                    document['sent_bytes'] = int(document['sent_bytes'])
+                    
+                    # Send to OpenSearch
                     r = requests.post(url, auth=awsauth, json=document, headers=headers)
                     print("Successfully sent to opensearch")
                 else:
