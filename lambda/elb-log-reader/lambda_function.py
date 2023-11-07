@@ -6,7 +6,7 @@ from requests_aws4auth import AWS4Auth
 from botocore.response import StreamingBody
 from datetime import datetime
 
-region = 'us-gov-west-1'
+region = 'us-west-1'
 service = 'es'
 credentials = boto3.Session().get_credentials()
 awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
