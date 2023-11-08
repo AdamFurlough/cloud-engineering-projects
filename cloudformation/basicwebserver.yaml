@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2023-02-05"
+Description: My pratice template
+
+Parameters:
+  InstanceTypeParameter:  #This parameter sets the instance size to be used when creating the stack
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - m1.small
+      - m1.large
+    Description: Enter t2.micro, m1.small, or m1.large. Default is t2.micro.
+  KeyNameParameter:  #This parameter sets the key pair that will be used to allow needed permissions
+    Type: String
+    Description: Enter key name
+
+Resources:
+  WebServer: #Web Server
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: "ami-0ff8a91507f77f867" #This is a Linux AMI
+      InstanceType:
+        Ref: InstanceTypeParameter  #Need to add references
+      KeyName:
+        Ref: KeyNameParameter
+      SecurityGroups:
+        Ref: WebServerSecurityGroup  #References the security group that is defined below
+      UserData:
+        Fn::Base64: !Sub |
+           #!/bin/bash -xe
+           yum update -y aws-cfn-bootstrap
+           /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource WebServer --configsets wordpress_install --region ${AWS::Region}
+           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource WebServer --region ${AWS::Region}
+  
+  WebServerSecurityGroup:  #This is the security for the webserver, it is referenced above in the web server's properties
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Enable HTTP access via port 80 locked down to the load balancer + SSH access"
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0  #Allows all http traffic in
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
+      - CidrIp: !Ref SSHLocation  #Allows ssh for instance management
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
