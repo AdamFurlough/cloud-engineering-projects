@@ -26,13 +26,19 @@ Goal: Need to shrink root volume on Server1, will use Server2 to work on the vol
       -	Default end sector
       -	w (write out)
 12.	Make new file systems for all new partitions: # mkfs.xfs -f /dev/xvdf4
-13.	Set UUID back to what is was before: # xfs_admin  -U 0027cd81-ffab-44f9-aea0-34d1e8e1a4c9 /dev/xvdf4
-14.	Check UUID: $ lsblk -f
-15.	Remount transient root volume: # mount -t xfs -o nouuid /dev/xvdf4 /mnt/server1root
-16.	Find xfsrestore session id: # xfsrestore -I | grep session
-17.	# xfsrestore -f /mnt/backup/backup.xfsdump -S a316e7e3-9c08-4bb2-9ee9-cf55defd9a82 /mnt/server1root
-18.	Restore from backup: # xfsrestore -f /mnt/backup/backup.xfsdump /mnt/server1root
-19.	Unmount transient root volume: # umount /dev/xvdf4
+13.	Set UUID back to what is was before
+    xfs_admin  -U 0027cd81-ffab-44f9-aea0-34d1e8e1a4c9 /dev/xvdf4
+14.	Check UUID
+    lsblk -f
+15.	Remount transient root volume
+    mount -t xfs -o nouuid /dev/xvdf4 /mnt/server1root
+16.	Find xfsrestore session id: 
+    xfsrestore -I | grep session
+17.	xfsrestore -f /mnt/backup/backup.xfsdump -S a316e7e3-9c08-4bb2-9ee9-cf55defd9a82 /mnt/server1root
+18.	Restore from backup
+    xfsrestore -f /mnt/backup/backup.xfsdump /mnt/server1root
+19.	Unmount transient root volume
+    umount /dev/xvdf4
 20.	Stop Server2
 21.	Detach EBS volume from Server2
 22.	Reattach to Server1 (be sure to set device name to /dev/sda1)
