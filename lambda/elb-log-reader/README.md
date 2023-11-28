@@ -1,17 +1,13 @@
-# ELB Log Reader
-Reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends to opensearch
+# Lambda, ELB Logs from S3
+- Purpose: reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends to opensearch
+- [based on this AWS Tutorial](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/integrations.html#integrations-s3-lambda)
 
-## LINKS
-- [AWS Tutorial I adapted](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/integrations.html#integrations-s3-lambda)
-- [boto3 documentation](boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)
-- [s3 obj with boto3 error stackoverflow](https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3)
-
-## NOTES
+## PREREQUISITES
 - create the function with an ENI inside the VPC containing OpenSearch domain
 - create a new iam role with s3 and opensearch domain access
 
 ## PACKAGE USING PIP
-...from the dir containing lambda_function.py and requirements.txt
+from the dir containing lambda_function.py and requirements.txt, run these commands:
 
 ```
 pip install -r requirements.txt -t package/
@@ -26,7 +22,11 @@ zip -g lambda.zip lambda_function.py
 - The -g option indicates that the file should be "grown" into the ZIP archive, meaning the file is added to the existing ZIP without recompressing the entire archive.
 - This can be faster than creating a new ZIP file and adding all the files again, especially if the existing ZIP archive is large.
 
-## TROUBLESHOOTING DEPENDANCIES
+## TROUBLESHOOTING BOTO3
+- [boto3 documentation](boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)
+- [s3 obj with boto3 error stackoverflow](https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3)
+
+## TROUBLESHOOTING DEPENDANCY VERSIONS
 - note that boto3 is only compatible with an older version of urllib3
 - if you try to use the latest urllib3 will get this error:
 ```[ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'DEFAULT_CIPHERS' from 'urllib3.util.ssl_' (/var/task/urllib3/util/ssl_.py) Traceback (most recent call last):```
