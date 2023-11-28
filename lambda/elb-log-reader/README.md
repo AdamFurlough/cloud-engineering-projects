@@ -26,7 +26,7 @@ zip -g lambda.zip lambda_function.py
 - [boto3 documentation](boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)
 - [s3 obj with boto3 error stackoverflow](https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3)
 
-## TROUBLESHOOTING DEPENDANCY VERSIONS
+## TROUBLESHOOTING DEPENDENCY VERSIONS
 - note that boto3 is only compatible with an older version of urllib3
 - if you try to use the latest urllib3 will get this error:
 ```[ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'DEFAULT_CIPHERS' from 'urllib3.util.ssl_' (/var/task/urllib3/util/ssl_.py) Traceback (most recent call last):```
