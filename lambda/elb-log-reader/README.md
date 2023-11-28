@@ -34,7 +34,6 @@ zip -g lambda.zip lambda_function.py
 - The -g option indicates that the file should be "grown" into the ZIP archive, meaning the file is added to the existing ZIP without recompressing the entire archive.
 - This can be faster than creating a new ZIP file and adding all the files again, especially if the existing ZIP archive is large.
 
-
 ## TROUBLESHOOTING
 - if issues with urllib3
 - make sure using older version compatible with botocore
