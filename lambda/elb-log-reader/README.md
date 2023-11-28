@@ -5,6 +5,9 @@
 ## PREREQUISITES
 - create the function with an ENI inside the VPC containing OpenSearch domain
 - create a new iam role with s3 and opensearch domain access
+- make sure security group allows access to the OpenSearch domain and the S3 endpoint
+    - to allow access to the S3 endpoint create an outbound HTTPS rule in your security group with the VPC endpoint prefix as your destination, e.g. pl-xxxx
+    - You can get the endpoint prefix in the AWS console via VPC --> Managed Prefix Lists --> prefix that points to S3
 
 ## PACKAGE USING PIP
 from the dir containing lambda_function.py and requirements.txt, run these commands:
