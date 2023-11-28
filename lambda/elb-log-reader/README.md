@@ -13,17 +13,21 @@ Reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends
 
 ## INSTALL PIP
 from the lambda dir...
+```
 pip install --target ./package requests
 pip install --target ./package requests_aws4auth
+```
 
 ## PACKAGE
 ...from the dir containing lambda_function.py and requirements.txt
 
+```
 pip install -r requirements.txt -t package/
 cd package
 zip -r ../lambda.zip .
 cd ..
 zip -g lambda.zip lambda_function.py
+```
 
 ## EXPLANATION OF PACKAGING
 - The command zip -g lambda.zip sample.py uses the zip utility to add the sample.py file to an existing ZIP archive named lambda.zip.
