@@ -35,6 +35,7 @@ zip -g lambda.zip lambda_function.py
 - This can be faster than creating a new ZIP file and adding all the files again, especially if the existing ZIP archive is large.
 
 ## TROUBLESHOOTING
+[ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'DEFAULT_CIPHERS' from 'urllib3.util.ssl_' (/var/task/urllib3/util/ssl_.py) Traceback (most recent call last):
 - if issues with urllib3
 - make sure using older version compatible with botocore
 - try clearing pip cashe ```pip cache purge```
