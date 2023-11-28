@@ -11,14 +11,7 @@ Reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends
 - needs to create the function with an ENI inside the VPC containing OpenSearch domain
 - need to create a new iam role with s3 and opensearch domain access
 
-## INSTALL PIP
-from the lambda dir...
-```
-pip install --target ./package requests
-pip install --target ./package requests_aws4auth
-```
-
-## PACKAGE
+## PACKAGE USING PIP
 ...from the dir containing lambda_function.py and requirements.txt
 
 ```
