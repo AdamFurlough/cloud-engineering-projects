@@ -7,8 +7,8 @@ Reads ELB logs from an S3 bucket, unzips them, extract terms into json and sends
 - [s3 obj with boto3 error stackoverflow](https://stackoverflow.com/questions/31976273/open-s3-object-as-a-string-with-boto3)
 
 ## NOTES
-- needs to create the function with an ENI inside the VPC containing OpenSearch domain
-- need to create a new iam role with s3 and opensearch domain access
+- create the function with an ENI inside the VPC containing OpenSearch domain
+- create a new iam role with s3 and opensearch domain access
 
 ## PACKAGE USING PIP
 ...from the dir containing lambda_function.py and requirements.txt
