@@ -33,3 +33,9 @@ zip -g lambda.zip lambda_function.py
 - The command zip -g lambda.zip sample.py uses the zip utility to add the sample.py file to an existing ZIP archive named lambda.zip.
 - The -g option indicates that the file should be "grown" into the ZIP archive, meaning the file is added to the existing ZIP without recompressing the entire archive.
 - This can be faster than creating a new ZIP file and adding all the files again, especially if the existing ZIP archive is large.
+
+
+## TROUBLESHOOTING
+- if issues with urllib3
+- make sure using older version compatible with botocore
+- try clearing pip cashe ```pip cache purge```
