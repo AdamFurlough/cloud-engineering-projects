@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates IAM user service account
+Parameters:
+
+### Account Type for Secrets Manager ####
+  AccountType:
+    Type: String
+    Default: "dedicated"
+    AllowedValues:
+      - "shared"
+      - "dedicated"
+    Description: "Specifies whether the AWS Account is shared or dedicated. Used for condition to set tag limiting access to the access key in secrets manager."
+
+### IAM Policies ###
+  NewPolicyPath:
+    Type: String
+    Description: S3 URI of the JSON policy that will used to create the IAM policy
+    Default: 's3://BucketName/file/path.json'
+    AllowedPattern: "^s3://BucketName(/[^/]+)*(/[^/]+\\.json)$"
+    ConstraintDescription: "Must be a valid S3 URI, such as 's3://BucketName/file/path.json'."
+  PolicyARN1:
+    Type: String
+    Description: "Add up to PolicyARN9 or leave out any that are unneeded and the parameters will default to 'none' and be ignored."
+    Default: 'none'
+  PolicyARN2:
+    Type: String
+    Default: 'none'
+  PolicyARN3:
+    Type: String
+    Default: 'none'
+  PolicyARN4:
+    Type: String
+    Default: 'none'
+  PolicyARN5:
+    Type: String
+    Default: 'none'
+  PolicyARN6:
+    Type: String
+    Default: 'none'
+  PolicyARN7:
+    Type: String
+    Default: 'none'
+  PolicyARN8:
+    Type: String
+    Default: 'none'
+  PolicyARN9:
+    Type: String
+    Default: 'none'
+
+### Standard Tags ###
+  Name:
+    Type: String
+    Description: "prefix that will be used for the IAM user"
+    Default: ''
+  Department:
+    Type: String
+    Description: Department the resource belongs to 
+    Default: 'department-name'
+  ProgramName:
+    Type: String
+    Description: 'program the resource belongs to'
+    Default: 'program1'
+    AllowedValues:
+      - 'program1'
+      - 'program2'
+  Environment:
+    Type: String
+    Description: Environment the resource belongs to
+    Default: 'dev'
+    AllowedValues:
+      - 'dev'
+      - 'test'
+      - 'pre-prod'
+      - 'prod'
+      - 'sandbox'
+  ApplicationName:
+    Type: String
+    Description: Application the resource belongs to
+    Default: ''
+  ServiceType:
+    Type: String
+    Description: 'Service offering the resource belongs to'
+    Default: 'tenant'
+    AllowedValues:
+      - 'tenant'
+      - 'coreservice'
+  ProductOwner:
+    Type: String
+    Description: 'The owner of the resource/application'
+    Default: 'tbd'
+
+Conditions:
+### Condition for Secrets Manager tag ###
+  IsAccountTypeShared: !Equals [!Ref AccountType, "shared"]
+
+### Conditions for IAM Policies ###
+  PolicyARN1IsValid: !Not [!Equals [!Ref PolicyARN1, 'none']]
+  PolicyARN2IsValid: !Not [!Equals [!Ref PolicyARN2, 'none']]
+  PolicyARN3IsValid: !Not [!Equals [!Ref PolicyARN3, 'none']]
+  PolicyARN4IsValid: !Not [!Equals [!Ref PolicyARN4, 'none']]
+  PolicyARN5IsValid: !Not [!Equals [!Ref PolicyARN5, 'none']]
+  PolicyARN6IsValid: !Not [!Equals [!Ref PolicyARN6, 'none']]
+  PolicyARN7IsValid: !Not [!Equals [!Ref PolicyARN7, 'none']]
+  PolicyARN8IsValid: !Not [!Equals [!Ref PolicyARN8, 'none']]
+  PolicyARN9IsValid: !Not [!Equals [!Ref PolicyARN9, 'none']]
+
+Resources:
+
+### ServiceAccount ###
+  ServiceAccount:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Join ["-", [!Ref ProgramName, !Ref Name, 'service-account']]
+      ManagedPolicyArns:
+        - !Ref ServiceAccountPolicy
+        - !If [PolicyARN1IsValid, !Ref PolicyARN1, !Ref "AWS::NoValue"]
+        - !If [PolicyARN2IsValid, !Ref PolicyARN2, !Ref "AWS::NoValue"]
+        - !If [PolicyARN3IsValid, !Ref PolicyARN3, !Ref "AWS::NoValue"]
+        - !If [PolicyARN4IsValid, !Ref PolicyARN4, !Ref "AWS::NoValue"]
+        - !If [PolicyARN5IsValid, !Ref PolicyARN5, !Ref "AWS::NoValue"]
+        - !If [PolicyARN6IsValid, !Ref PolicyARN6, !Ref "AWS::NoValue"]
+        - !If [PolicyARN7IsValid, !Ref PolicyARN7, !Ref "AWS::NoValue"]
+        - !If [PolicyARN8IsValid, !Ref PolicyARN8, !Ref "AWS::NoValue"]
+        - !If [PolicyARN9IsValid, !Ref PolicyARN9, !Ref "AWS::NoValue"]
+      # add ability to set additional policy attachments
+      Tags: 
+        - Key: Name
+          Value: !Join ["-", [!Ref ProgramName, !Ref Name, 'service-account']]
+        - Key: department
+          Value: !Ref Department
+        - Key: program_name
+          Value: !Ref ProgramName
+        - Key: environment
+          Value: !Ref Environment
+        - Key: application
+          Value: !Ref ApplicationName
+        - Key: service_type
+          Value: !Ref ServiceType
+        - Key: product_owner
+          Value: !Ref ProductOwner
+
+### Policy ###
+  ServiceAccountPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Join ["-", [!Ref ProgramName, !Ref Name, 'policy']]
+      PolicyDocument:
+        Fn::Transform:
+          Name: 'AWS::Include'
+          Parameters:
+            Location: !Ref NewPolicyPath
+
+  # Generate Access Key for Service Account
+  AccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref ServiceAccount
+
+  # Create a Secret in Secrets Manager to store the Access Key and Secret Key
+  SecretsManagerSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Join ["-", [!Ref ProgramName, !Ref Name, 'service-account', 'access-key']]
+      Description: "Access key and secret key for service account"
+      SecretString: !Sub
+        - '{"AccessKey": "${AccessKey}", "SecretAccessKey": "${SecretAccessKey}"}'  # Save in json so values can be shown with easy copy icon in secrets manager console
+        - AccessKey: !Ref AccessKey
+          SecretAccessKey: !GetAtt AccessKey.SecretAccessKey
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref ProgramName, !Ref Name, 'service-account']]
+        - Key: department
+          Value: !Ref Department
+        - Key: program_name
+          Value: !Ref ProgramName
+        - Key: environment
+          Value: !Ref Environment
+        - Key: application
+          Value: !Ref ApplicationName
+        - Key: service_type
+          Value: !Ref ServiceType
+        - Key: product_owner
+          Value: !Ref ProductOwner
+        - !If
+          - IsAccountTypeShared  # Conditionally add the Access tag when AccountType parameter is set to "shared"
+          - Key: "access_level"  # SCP will deny "secretsmanager:GetSecretValue" if condition tag 'access_level' | 'iam'
+            Value: "iam"
+          - Ref: "AWS::NoValue"  # No tag if the condition is false

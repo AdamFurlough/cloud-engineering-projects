@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Child template for creating an S3 bucket
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the new S3 bucket that will be created
+    AllowedPattern: "^([a-z0-9-])+$"
+    ConstraintDescription: "Must use kebab-case (lowercase letters separated by dash)."
+
+### Versioning ###
+  VersioningConfigurationStatus:
+    Type: String
+    Description: "Should versioning be on or off for the new bucket?"
+    Default: Suspended
+    AllowedValues:
+      - Enabled
+      - Suspended
+
+### Bucket Policy ###
+  S3BucketPolicyCreate:
+    Type: String
+    Description: 'Should an access policy be set on the new S3 bucket that will be created? Parameter S3BucketPolicyPath must be also provided if "Yes" is selected.'    
+    Default: No
+    AllowedValues:
+      - No
+      - Yes
+  S3BucketPolicyPath:
+    Type: String
+    Description: S3 URI of the JSON policy that will be set as the bucket policy
+    Default: 's3://BucketName/file/path.json'
+    AllowedPattern: "^s3://BucketName(/[^/]+)*(/[^/]+\\.json)$"
+    ConstraintDescription: "Must be a valid S3 URI, such as 's3://BucketName/file/path.json'."
+
+### Standard Tags ###
+  Department:
+    Type: String
+    Description: Department the resource belongs to 
+    Default: 'department-name'
+  ProgramName:
+    Type: String
+    Description: 'program the resource belongs to'
+    Default: 'program1'
+    AllowedValues:
+      - 'program1'
+      - 'program2'
+  Environment:
+    Type: String
+    Description: Environment the resource belongs to
+    Default: 'dev'
+    AllowedValues:
+      - 'dev'
+      - 'test'
+      - 'pre-prod'
+      - 'prod'
+      - 'sandbox'
+  ApplicationName:
+    Type: String
+    Description: Application the resource belongs to
+    Default: ''
+  ServiceType:
+    Type: String
+    Description: 'Service offering the resource belongs to'
+    Default: 'tenant'
+    AllowedValues:
+      - 'tenant'
+      - 'coreservice'
+  ProductOwner:
+    Type: String
+    Description: 'The owner of the resource/application'
+    Default: 'tbd'
+
+Conditions:
+  S3BucketPolicyCreate: !Equals [!Ref S3BucketPolicyCreate, "Yes"]
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration: 
+        Status: !Ref VersioningConfigurationStatus
+      Tags: 
+        - Key: Name
+          Value: !Ref BucketName
+        - Key: department
+          Value: !Ref Department
+        - Key: program_name
+          Value: !Ref ProgramName
+        - Key: environment
+          Value: !Ref Environment
+        - Key: application
+          Value: !Ref ApplicationName
+        - Key: service_type
+          Value: !Ref ServiceType
+        - Key: product_owner
+          Value: !Ref ProductOwner
+
+  S3BucketPolicy:
+    Condition: S3BucketPolicyCreate  # Policy is only created if condition is true
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Fn::Transform:
+          Name: 'AWS::Include'
+          Parameters:
+            Location: !Ref S3BucketPolicyPath

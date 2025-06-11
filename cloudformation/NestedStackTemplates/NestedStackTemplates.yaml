@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Copy this combined nested stack template into a deployment folder
+  Delete all nested stack resources besides the one for the resource type you are deploying
+  Reference the child template for the resource type you are deploying to see allowed values for each parameter and further descriptions
+
+Resources:
+
+# IAM Role
+  ServiceRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: 'https://BucketName.s3.us-west-1.amazonaws.com/file/path.yaml'
+      Parameters:
+      # Trust Policy (what principal can use the role)
+        PrincipalType:  # Choose either:  ServicePrincipal  or  IAMPrincipal
+        ServicePrincipal:  # Select the Service from:  na.amazonaws.com  ec2.amazonaws.com  lambda.amazonaws.com  s3.amazonaws.com
+        IAMPrincipal:  # 'arn:aws:iam::123412341234:role/ExampleRole'
+      # IAM Policy (what the role is allowed to do) 
+        NewPolicyPath:  # 's3://BucketName/file/path.json'
+        PolicyARN1:  # 'arn:aws:iam::123412341234:policy/ExamplePolicy' 
+        PolicyARN2:  # Add up to PolicyARN9 if needed or leave out and the parameter will default to 'none'
+      # Tags
+        Name:  # prefix that will be used for the IAM role. Will be appended with resource type so end name will be '${ProgramName}-${Name}-service-role'
+        Department:
+        ProgramName:
+        Environment:  # Select from:  dev  test  pre-prod  prod  sandbox
+        ApplicationName:  # name of the application the role will support (in kebab-case)
+        ServiceType:  # Choose either:  tenant  or  coreservice
+        ProductOwner:  # Name of the product owner in "FirstName LastName"
+
+# IAM User
+  ServiceAccount: 
+    Type: 'AWS::CloudFormation::Stack'
+    Properties: 
+      TemplateURL: 'https://BucketName.s3.us-west-1.amazonaws.com/file/path.yaml'
+      Parameters:
+      # IAM Policy (what the account is allowed to do)
+        NewPolicyPath: # 's3://BucketName/file/path.json'
+        PolicyARN1: # 'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess' # Add up to PolicyARN9 or leave out any that are unneeded and the parameters will default to 'none' and be ignored
+      # Access Key in secrets manager
+        AccountType:  # shared or dedicated, sets whether the access key in secrets manager can be read by anyone or just IAM Admins
+      # Tags
+        Name:  # prefix that will be used for the IAM user
+        Department:
+        ProgramName:
+        Environment:  # Select from:  dev  test  pre-prod  prod  sandbox
+        ApplicationName:  # name of the application the role will support (in kebab-case)
+        ServiceType:  # Choose either:  tenant  or  coreservice
+        ProductOwner:  # Name of the product owner in "FirstName LastName"
+
+# Identity Center PermissionSet and Account Assignments - Assign all except for management account and sandboxes
+  IdentityCenterStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: # 'https://BucketName.s3.us-west-1.amazonaws.com/file/path.yaml'
+      Parameters:
+      # PermissionSet
+        PermissionSetName: # 'example-name'
+      # Account Assignments
+        PolicyPath: # 's3://BucketName/file/path.json'
+        GroupId: # '1234abcd-1234abcd-1234abcd'
+
+# Identity Center PermissionSet and Account Assignments - Custom Accounts (assign up to 15)
+  IdentityCenterCustomStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://BucketName.s3.us-west-1.amazonaws.com/file/path.yaml'
+      Parameters:
+      # PermissionSet
+        PermissionSetName: # 'example-name'
+        PolicyPath: # 's3://BucketName/file/path.json'
+      # Account Assignments
+        GroupId: # '1234abcd-1234abcd-1234abcd'
+        AccountId1: # '111111111111'
+        AccountId2: # '222222222222'
+
+# S3 Bucket
+  S3Bucket:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: 'https://BucketName.s3.us-west-1.amazonaws.com/file/path.yaml'
+      Parameters:
+      # Basics
+        BucketName: # my-bucket-name in kebab-case
+        VersioningConfigurationStatus: # Suspended or Enabled
+      # Bucket Policy
+        S3BucketPolicyCreate: # Yes or No
+        S3BucketPolicyPath: # 's3://BucketName/file/path.json'  # S3 URI
+      # Tags
+        Name:  # prefix that will be used for the IAM user
+        Department:
+        ProgramName:
+        Environment:  # Select from:  dev  test  pre-prod  prod  sandbox
+        ApplicationName:  # name of the application the role will support (in kebab-case)
+        ServiceType:  # Choose either:  tenant  or  coreservice
+        ProductOwner:  # Name of the product owner in "FirstName LastName"

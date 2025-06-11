@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates PermissionSet and account assignments as a nested stack.
+Parameters:
+  SsoInstanceArn:
+    Type: String
+    Default: 'arn:aws:sso:::instance/ssoins-1234123412341234'
+    Description: 'ARN of the IAM Identity Center instance under which the operation will be executed'
+  PermissionSetName:
+    Type: String
+  PolicyPath:
+    Type: String 
+  GroupId:
+    Type: String
+
+Resources:
+  PermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: !Ref PermissionSetName
+      Description: !Ref PermissionSetName
+      InstanceArn: !Ref SsoInstanceArn
+      SessionDuration: 'PT4H'
+      ManagedPolicies:
+        - arn:aws-us-gov:iam::aws:policy/ReadOnlyAccess
+      InlinePolicy:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: !Ref PolicyPath
+
+  RoleAssignment111122223333:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: '111122223333'
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId

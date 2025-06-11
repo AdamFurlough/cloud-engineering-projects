@@ -1,0 +1,279 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates permission set and up to 10 account assignments
+Parameters:
+  SsoInstanceArn:
+    Type: String
+    Default: 'arn:aws:sso:::instance/ssoins-123412341234'
+    Description: 'ARN of the IAM Identity Center instance under which the operation will be executed'
+
+# Passed from parent stack and shared with all assignments
+  PermissionSetName:
+    Type: String
+  PolicyPath:
+    Type: String 
+  GroupId:
+    Type: String
+
+# Account IDs for each assignment
+  # If parameter is left out it defaults to 'none' and the assignment will be skipped 
+  # This allows for a variable number of assignments from 1-10 total
+  AccountId1:
+    Type: String
+    Default: 'none'
+  AccountId2:
+    Type: String
+    Default: 'none'
+  AccountId3:
+    Type: String
+    Default: 'none'
+  AccountId4:
+    Type: String
+    Default: 'none'
+  AccountId5:
+    Type: String
+    Default: 'none'
+  AccountId6:
+    Type: String
+    Default: 'none'
+  AccountId7:
+    Type: String
+    Default: 'none'
+  AccountId8:
+    Type: String
+    Default: 'none'
+  AccountId9:
+    Type: String
+    Default: 'none'
+  AccountId10:
+    Type: String
+    Default: 'none'
+  AccountId11:
+    Type: String
+    Default: 'none'
+  AccountId12:
+    Type: String
+    Default: 'none'
+  AccountId13:
+    Type: String
+    Default: 'none'
+  AccountId14:
+    Type: String
+    Default: 'none'
+  AccountId15:
+    Type: String
+    Default: 'none'
+  AccountId16:
+    Type: String
+    Default: 'none'
+
+Conditions:
+  IsAccountId1Valid: !Not [!Equals [!Ref AccountId1, 'none']]
+  IsAccountId2Valid: !Not [!Equals [!Ref AccountId2, 'none']]
+  IsAccountId3Valid: !Not [!Equals [!Ref AccountId3, 'none']]
+  IsAccountId4Valid: !Not [!Equals [!Ref AccountId4, 'none']]
+  IsAccountId5Valid: !Not [!Equals [!Ref AccountId5, 'none']]
+  IsAccountId6Valid: !Not [!Equals [!Ref AccountId6, 'none']]
+  IsAccountId7Valid: !Not [!Equals [!Ref AccountId7, 'none']]
+  IsAccountId8Valid: !Not [!Equals [!Ref AccountId8, 'none']]
+  IsAccountId9Valid: !Not [!Equals [!Ref AccountId9, 'none']]
+  IsAccountId10Valid: !Not [!Equals [!Ref AccountId10, 'none']]
+  IsAccountId11Valid: !Not [!Equals [!Ref AccountId11, 'none']]
+  IsAccountId12Valid: !Not [!Equals [!Ref AccountId12, 'none']]
+  IsAccountId13Valid: !Not [!Equals [!Ref AccountId13, 'none']]
+  IsAccountId14Valid: !Not [!Equals [!Ref AccountId14, 'none']]
+  IsAccountId15Valid: !Not [!Equals [!Ref AccountId15, 'none']]
+  IsAccountId16Valid: !Not [!Equals [!Ref AccountId16, 'none']]
+  
+Resources:
+# PermissionSet
+  PermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: !Ref PermissionSetName
+      Description: !Ref PermissionSetName
+      InstanceArn: !Ref SsoInstanceArn
+      SessionDuration: 'PT4H'
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      InlinePolicy:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: !Ref PolicyPath
+
+# Account Assignments
+  Assignment1:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId1Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId1
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment2:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId2Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId2
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment3:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId3Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId3
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment4:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId4Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId4
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment5:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId5Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId5
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+      
+  Assignment6:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId6Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId6
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment7:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId7Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId7
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment8:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId8Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId8
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment9:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId9Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId9
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment10:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId10Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId10
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment11:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId11Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId11
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment12:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId12Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId12
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment13:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId13Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId13
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment14:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId14Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId14
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment15:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId15Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId15
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId
+
+  Assignment16:
+    Type: AWS::SSO::Assignment
+    Condition: IsAccountId16Valid
+    Properties:
+      InstanceArn: !Ref SsoInstanceArn
+      PermissionSetArn: !GetAtt PermissionSet.PermissionSetArn
+      TargetId: !Ref AccountId16
+      TargetType: 'AWS_ACCOUNT'
+      PrincipalType: 'GROUP'
+      PrincipalId: !Ref GroupId

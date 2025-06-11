@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates Service Control Policy (SCP).  Either attach to OU manually or add attachment property.
+Resources:
+  SCP:
+    DeletionPolicy: Retain
+    Type: AWS::Organizations::Policy
+    Properties:
+      Type: SERVICE_CONTROL_POLICY
+      Name: "SCP_Name"
+      Description: "Description of the SCP."
+      Content:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: "s3://BucketName/file/path.json"

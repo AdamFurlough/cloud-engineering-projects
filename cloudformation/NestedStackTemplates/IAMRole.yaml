@@ -1,0 +1,199 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Child template for creating a service role with a custom policy
+Parameters:
+
+### Trust Policy ###
+  PrincipalType:
+    Type: String
+    Description: Select if using ServicePrincipal or IAMPrincipal
+    Default: ServicePrincipal
+    AllowedValues:
+      - ServicePrincipal
+      - IAMPrincipal
+
+  ServicePrincipal:
+    Type: String
+    Description: Principal Name of the trusted service (Select 'na.amazonaws.com' if using IAMPrincipal instead)
+    Default: ec2.amazonaws.com
+    AllowedValues:
+      - ec2.amazonaws.com
+      - lambda.amazonaws.com
+      - s3.amazonaws.com
+      - na.amazonaws.com
+    AllowedPattern: "^([a-zA-Z0-9-]+\\.amazonaws\\.com)$"  # Regex for any valid AWS service principal (e.g., custom service principal)
+    ConstraintDescription: "Must be a valid AWS service principal, such as ec2.amazonaws.com or any custom service principal in the format 'service.amazonaws.com'."
+
+  IAMPrincipal:
+    Type: String
+    Description: ARN of the trusted IAM resource
+    Default: 'arn:aws:iam::123412341234:role/ExampleRole'
+    AllowedPattern: "^arn:aws:iam::[0-9]{12}:role/[a-zA-Z0-9-_]+$"
+    ConstraintDescription: "Must be a valid AWS ARN, such as 'arn:aws:iam::123412341234:role/ExampleRole'."
+
+### IAM Policies ###
+  NewPolicyPath:
+    Type: String
+    Description: S3 URI of the JSON policy that will used to create the IAM policy
+    Default: 's3://BucketName/file/path.json'
+    AllowedPattern: "^s3://BucketName(/[^/]+)*(/[^/]+\\.json)$"
+    ConstraintDescription: "Must be a valid S3 URI, such as 's3://BucketName/file/path.json'."
+
+  PolicyARN1:
+    Type: String
+    Description: "Add up to PolicyARN9 or leave out any that are unneeded and the parameters will default to 'none' and be ignored."
+    Default: 'none'
+  PolicyARN2:
+    Type: String
+    Default: 'none'
+  PolicyARN3:
+    Type: String
+    Default: 'none'
+  PolicyARN4:
+    Type: String
+    Default: 'none'
+  PolicyARN5:
+    Type: String
+    Default: 'none'
+  PolicyARN6:
+    Type: String
+    Default: 'none'
+  PolicyARN7:
+    Type: String
+    Default: 'none'
+  PolicyARN8:
+    Type: String
+    Default: 'none'
+  PolicyARN9:
+    Type: String
+    Default: 'none'
+
+### Standard Tags ###
+  Name:
+    Type: String
+    Description: "prefix that will be used for the IAM role"
+    Default: ''
+  Department:
+    Type: String
+    Description: Department the resource belongs to 
+    Default: 'department-name'
+  ProgramName:
+    Type: String
+    Description: 'program the resource belongs to'
+    Default: 'program1'
+    AllowedValues:
+      - 'program1'
+      - 'program2'
+  Environment:
+    Type: String
+    Description: Environment the resource belongs to
+    Default: 'dev'
+    AllowedValues:
+      - 'dev'
+      - 'test'
+      - 'pre-prod'
+      - 'prod'
+      - 'sandbox'
+  ApplicationName:
+    Type: String
+    Description: Application the resource belongs to
+    Default: ''
+  ServiceType:
+    Type: String
+    Description: 'Service offering the resource belongs to'
+    Default: 'tenant'
+    AllowedValues:
+      - 'tenant'
+      - 'coreservice'
+  ProductOwner:
+    Type: String
+    Description: 'The owner of the resource/application'
+    Default: 'tbd'
+
+Conditions:
+### Conditions for Trust Policy ###
+  TrustPolicyServicePrincipalIsEC2: !Equals [!Ref ServicePrincipal, "ec2.amazonaws.com"]
+  PrincipalTypeIsServicePrincipal: !Equals [!Ref PrincipalType, "ServicePrincipal"]
+
+### Conditions for IAM Policies ###
+  PolicyARN1IsValid: !Not [!Equals [!Ref PolicyARN1, 'none']]
+  PolicyARN2IsValid: !Not [!Equals [!Ref PolicyARN2, 'none']]
+  PolicyARN3IsValid: !Not [!Equals [!Ref PolicyARN3, 'none']]
+  PolicyARN4IsValid: !Not [!Equals [!Ref PolicyARN4, 'none']]
+  PolicyARN5IsValid: !Not [!Equals [!Ref PolicyARN5, 'none']]
+  PolicyARN6IsValid: !Not [!Equals [!Ref PolicyARN6, 'none']]
+  PolicyARN7IsValid: !Not [!Equals [!Ref PolicyARN7, 'none']]
+  PolicyARN8IsValid: !Not [!Equals [!Ref PolicyARN8, 'none']]
+  PolicyARN9IsValid: !Not [!Equals [!Ref PolicyARN9, 'none']]
+
+
+Resources:
+
+### Service Role ###
+  ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ["-", [!Ref ProgramName, !Ref ApplicationName, !Ref Name, 'role']]
+      Tags: 
+        - Key: Name
+          Value: !Join ["-", [!Ref ProgramName, !Ref ApplicationName, !Ref Name, 'role']]
+        - Key: department
+          Value: !Ref Department
+        - Key: program_name
+          Value: !Ref ProgramName
+        - Key: environment
+          Value: !Ref Environment
+        - Key: application
+          Value: !Ref ApplicationName
+        - Key: service_type
+          Value: !Ref ServiceType
+        - Key: product_owner
+          Value: !Ref ProductOwner
+      AssumeRolePolicyDocument:
+        Fn::If:
+          - PrincipalTypeIsServicePrincipal
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Principal:
+                  Service: !Ref ServicePrincipal
+                Action: sts:AssumeRole
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Principal:
+                  AWS: !Ref IAMPrincipal
+                Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref ManagedPolicy
+        - !If [PolicyARN1IsValid, !Ref PolicyARN1, !Ref "AWS::NoValue"]
+        - !If [PolicyARN2IsValid, !Ref PolicyARN2, !Ref "AWS::NoValue"]
+        - !If [PolicyARN3IsValid, !Ref PolicyARN3, !Ref "AWS::NoValue"]
+        - !If [PolicyARN4IsValid, !Ref PolicyARN4, !Ref "AWS::NoValue"]
+        - !If [PolicyARN5IsValid, !Ref PolicyARN5, !Ref "AWS::NoValue"]
+        - !If [PolicyARN6IsValid, !Ref PolicyARN6, !Ref "AWS::NoValue"]
+        - !If [PolicyARN7IsValid, !Ref PolicyARN7, !Ref "AWS::NoValue"]
+        - !If [PolicyARN8IsValid, !Ref PolicyARN8, !Ref "AWS::NoValue"]
+        - !If [PolicyARN9IsValid, !Ref PolicyARN9, !Ref "AWS::NoValue"]
+
+
+### New Policy ###
+  ManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Join ["-", [!Ref ProgramName, !Ref ApplicationName, !Ref Name, 'policy']]
+      Description: !Join ["-", [!Ref ProgramName, !Ref ApplicationName, !Ref Name, 'policy']]
+      PolicyDocument:
+        Fn::Transform:
+          Name: 'AWS::Include'
+          Parameters:
+            Location: !Ref NewPolicyPath
+
+### InstanceProfile ###
+  RootInstanceProfile:
+    Condition: TrustPolicyServicePrincipalIsEC2  # Instance profile is only created if "ec2.amazonaws.com" is selected as ServicePrincipal
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      InstanceProfileName: !Join ["-", [!Ref ProgramName, !Ref ApplicationName, !Ref Name, 'profile']]
+      Roles: 
+        - !Ref ServiceRole

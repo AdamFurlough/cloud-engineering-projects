@@ -1,0 +1,39 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Condition": {
+                "StringEquals": {
+                    "aws:PrincipalTag/Disable": "True"
+                }
+            },
+            "Action": "*",
+            "Resource": "*",
+            "Effect": "Deny",
+            "Sid": "DisableIfTagTrue"
+        },
+        {
+            "Condition": {
+                "StringNotLike": {
+                    "aws:PrincipalARN": [
+                        "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/us-west-1/AWSReservedSSO_admin_*"
+                    ]
+                },
+                "ForAnyValue:StringEquals": {
+                    "aws:TagKeys": "Disable"
+                }
+            },
+            "Action": [
+                "iam:TagPolicy",
+                "iam:TagRole",
+                "iam:TagUser",
+                "iam:UntagPolicy",
+                "iam:UntagRole",
+                "iam:UntagUser"
+            ],
+            "Resource": "*",
+            "Effect": "Deny",
+            "Sid": "PreventChangesToDisableTag"
+        }
+    ]
+}
