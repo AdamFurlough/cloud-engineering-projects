@@ -1,0 +1,42 @@
+{
+	"Version": "2012-10-17",
+	"Id": "BaselineRoleServerAccess",
+	"Statement": [
+		{
+            "Sid": "ServerAccessLimitedByTag",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:StartInstances",
+				"ec2:StopInstances",
+				"ec2:RebootInstances",
+				"ssm:DescribeSessions",
+				"ssm:StartSession",
+				"ssm:ResumeSession",
+				"ssm:TerminateSession"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringLike": {
+					"aws:ResourceTag/access_level": "TeamNameTag"  # Change Tag value to the name of specific team
+				}
+			}
+		},
+		{
+			"Sid": "SSMDocumentAccess",
+			"Effect": "Allow",
+			"Action": "ssm:StartSession",
+			"Resource": "arn:aws:ssm:*:*:document/*"
+		},
+		{
+            "Sid": "KMSforSSMtoEC2",
+			"Effect": "Allow",
+			"Action": [
+				"kms:Decrypt",
+				"kms:GenerateDataKey",
+				"kms:GetKeyPolicy",
+				"kms:GetPublicKey"
+			],
+			"Resource": "*"
+		}
+	]
+}
