@@ -1,0 +1,6 @@
+# Observability Project - Step 3 - run adot container
+
+```
+sudo docker pull amazon/aws-otel-collector
+docker run -d --rm -p 4317:4317 -p 55680-55681:55680-55681 -p 8888:8888 -p 9411:9411 -p 9080:9080 -v /home/ec2-user/config.yaml:/otel-local-config.yaml --name awscollector amazon/aws-otel-collector
+```
