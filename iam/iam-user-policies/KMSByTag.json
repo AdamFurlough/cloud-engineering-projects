@@ -1,0 +1,21 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "KMS with tag condition",
+            "Effect": "Allow",
+            "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+            ],
+            "Resource": "arn:aws:kms::123456789012:key/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/Application": "ExampleApp"
+                }
+            }
+        }
+    ]
+}
