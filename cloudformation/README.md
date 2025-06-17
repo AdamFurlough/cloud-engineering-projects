@@ -126,72 +126,83 @@ Document:
 ### Nested Template URLs
 
 Use S3 URIs for nested templates and IAM policies. Ensure they are:
-•	Publicly readable if cross-account deployment is needed
-•	Versioned using S3 object versioning or consistent prefixes
-S3 URI File Paths for JSON Policies
+
+- Publicly readable if cross-account deployment is needed
+- Versioned using S3 object versioning or consistent prefixes
+- S3 URI File Paths for JSON Policies
+ 
 Store reusable IAM policies in an S3 bucket with:
-•	Clear naming conventions (iam/policies/role-xyz-policy.json)
-•	Version control via prefixes or object versioning
-•	Restricted access where necessary using bucket policies
+
+- Clear naming conventions (iam/policies/role-xyz-policy.json)
+- Version control via prefixes or object versioning
+- Restricted access where necessary using bucket policies
 
 ### Resource Naming
 
-Naming Conventions
 Follow consistent patterns across all resources:
-•	Use camelCase or kebab-case as appropriate per resource type
-•	Avoid underscores (_) where AWS disallows them (e.g., S3 bucket names)
+
+- Use camelCase or kebab-case as appropriate per resource type
+-	Avoid underscores (_) where AWS disallows them (e.g., S3 bucket names)
 Resource Name Constraints
-•	Follow service-specific max length rules (AWS Resource Limits)
-•	Avoid including environment or account-specific info unless necessary
-•	Consider name collision risks in global namespaces (e.g., IAM roles)
+-	Follow service-specific max length rules (AWS Resource Limits)
+-	Avoid including environment or account-specific info unless necessary
+-	Consider name collision risks in global namespaces (e.g., IAM roles)
 
 ### Resource Tagging
+
 Tag all resources using standard tagging practices defined in the [Tagging Guidance Document]. Tags should include:
-•	Name
-•	Environment
-•	Owner
-•	CostCenter
-•	Application
+
+- Name
+- Environment
+- Owner
+- CostCenter
+- Application
 
 ### Parameters
 
 Use Transform: AWS::Include to insert external JSON policy documents or templates when needed. This helps:
-•	Simplify templates
-•	Improve reuse and maintainability
-•	Reduce duplication
+
+-	Simplify templates
+-	Improve reuse and maintainability
+-	Reduce duplication
 
 ### Code Review
-Review by Engineer
-A senior engineer will verify:
-•	Template correctness and logical accuracy
-•	Reuse of parameters and outputs across stacks
-•	That best practices are followed (modularity, least privilege, naming conventions)
-•	Proper handling of IAM roles and permissions
+
+A senior engineer should verify:
+
+-	Template correctness and logical accuracy
+-	Reuse of parameters and outputs across stacks
+-	That best practices are followed (modularity, least privilege, naming conventions)
+-	Proper handling of IAM roles and permissions
+
 Common Breakage Points
-•	Adding required parameters to templates in active use (can break existing deployments)
-•	Changing logical IDs (causes resource replacement)
-•	Incorrect DependsOn or missing dependencies
-•	Hard-coded ARNs or region-specific values
+
+-	Adding required parameters to templates in active use (can break existing deployments)
+-	Changing logical IDs (causes resource replacement)
+-	Incorrect DependsOn or missing dependencies
+-	Hard-coded ARNs or region-specific values
 
 ### File Structure
 
 Naming Conventions
-•	File and folder names: use kebab-case (e.g., user-role-stack.yaml)
-•	Consistent suffixes for file types: *-role.yaml, *-policy.json
-•	Stack folders should include relevant context: networking/, iam/, compute/
+
+-	File and folder names: use kebab-case (e.g., user-role-stack.yaml)
+-	Consistent suffixes for file types: *-role.yaml, *-policy.json
+-	Stack folders should include relevant context: networking/, iam/, compute/
 
 Capitalization 
-•	File and folder names: lowercase only
-•	Logical IDs in CloudFormation: CamelCase (e.g., MyLambdaRole)
+
+-	File and folder names: lowercase only
+-	Logical IDs in CloudFormation: CamelCase (e.g., MyLambdaRole)
 
 ### Standard Templates
 
 Use of Nested Stacks
-•	Use nested stacks to encapsulate reusable components
-•	Child templates should be parameterized and version-controlled
-•	Reference using S3 URLs:
-TemplateURL: https://s3.amazonaws.com/my-bucket/templates/my-template.yaml
-•	Avoid adding required parameters to templates in active use—this can break production deployments
+
+-	Use nested stacks to encapsulate reusable components
+-	Child templates should be parameterized and version-controlled
+-	Reference using S3 URLs: `TemplateURL: https://s3.amazonaws.com/my-bucket/templates/my-template.yaml`
+-	Avoid adding required parameters to templates in active use—this can break production deployments
 
 ## Deployment
 
@@ -201,5 +212,6 @@ Deployment Models
 - StackSets - from management account or delegated CloudFormation admin account
 
 Permisisons Model
+
 - Service-managed is a simplified way to deploy stackset but it will not work when deploying nested stacksets.  If your template contains nested stacks you must use Self-Managed instead.
 - Self-managed deployment uses IAM that you manually select. 
