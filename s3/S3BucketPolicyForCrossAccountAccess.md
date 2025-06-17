@@ -21,8 +21,8 @@
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                    "arn:aws:iam::111111111111:role/aws-reserved/sso.amazonaws.com/us-gov-west-1/AWSReservedSSO_RoleName_1234123412341234",   // set ARN to SSO role you will use
-                    "arn:aws:iam::222222222222:role/aws-reserved/sso.amazonaws.com/us-gov-west-1/AWSReservedSSO_RoleName_1234123412341234"
+                    "arn:aws:iam::111111111111:role/aws-reserved/sso.amazonaws.com/us-west-1/AWSReservedSSO_RoleName_1234123412341234",   // set ARN to SSO role you will use
+                    "arn:aws:iam::222222222222:role/aws-reserved/sso.amazonaws.com/us-west-1/AWSReservedSSO_RoleName_1234123412341234"
                 ]
             },
             "Action": [
