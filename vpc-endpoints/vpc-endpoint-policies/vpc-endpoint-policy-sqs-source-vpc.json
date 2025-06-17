@@ -1,0 +1,22 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage"
+            ],
+            "Resource": [
+                "arn:aws:sws:us-east-1:123412341234:example-queue",
+                "arn:aws:s3:::bucket_name/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceVpce": "vpce-1a2b3c4d"
+                }
+            }
+        }
+    ]
+}
