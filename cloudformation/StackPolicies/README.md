@@ -15,7 +15,7 @@ When you create a stack, all update actions are allowed on all resources. By def
 
 This example policy shows all elements that can be included in the policy.
 
-```
+```json
 {
   "Statement" : [
     {
@@ -28,6 +28,32 @@ This example policy shows all elements that can be included in the policy.
           "ResourceType" : [resource_type, ...]
         }
       }
+    }
+  ]
+}
+```
+
+Example condition statement protecting nested stacks
+
+```json
+{
+  "Statement" : [
+    {
+      "Effect" : "Deny",
+      "Action" : "Update:*",
+      "Principal": "*",
+      "Resource" : "*",
+      "Condition" : {
+        "StringEquals" : {
+          "ResourceType" : ["AWS::CloudFormation::Stack"]
+        }
+      }
+    },
+    {
+      "Effect" : "Allow",
+      "Action" : "Update:*",
+      "Principal": "*",
+      "Resource" : "*"
     }
   ]
 }
