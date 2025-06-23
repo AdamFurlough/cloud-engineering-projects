@@ -1,0 +1,35 @@
+image:
+  name: amazon/aws-cli
+  entrypoint: [""]
+ 
+stages:
+  - validate
+  - deploy 
+
+#### Validate ####
+validate:
+  stage: validate
+  variables:
+    TEMPLATE_FILE: "./s3_cfn_template.yml"
+  script:
+    - set -euo pipefail
+    - echo "Validating CloudFormation template..."
+    - aws cloudformation validate-template --template-body "$TEMPLATE_FILE"
+
+#### Deploy ####
+deploy:
+  stage: deploy
+  variables:
+    TEMPLATE_FILE: "./s3_cfn_template.yml"
+    ASSUME_ROLE_ARN: "arn:aws:iam::111122223333:role/gitlab-cicd-execution-role"
+    SESSION_NAME: "GitLab-CI-Pipeline-Test"
+    AWS_DEFAULT_REGION: "us-west-1"
+    STACK_NAME: "sandbox-test-stack-gitlab-cicd-s3"
+  script:
+    - set -euo pipefail
+    - |
+      assume_role_json=$(aws sts assume-role --role-arn "$ASSUME_ROLE_ARN" --role-session-name "$SESSION_NAME")
+      export AWS_ACCESS_KEY_ID=$(echo "$assume_role_json" | grep -o '"AccessKeyId": *"[^"]*"' | cut -d'"' -f4)
+      export AWS_SECRET_ACCESS_KEY=$(echo "$assume_role_json" | grep -o '"SecretAccessKey": *"[^"]*"' | cut -d'"' -f4)
+      export AWS_SESSION_TOKEN=$(echo "$assume_role_json" | grep -o '"SessionToken": *"[^"]*"' | cut -d'"' -f4)
+    - aws cloudformation deploy --template-file "$TEMPLATE_FILE" --stack-name "$STACK_NAME" --capabilities CAPABILITY_NAMED_IAM
