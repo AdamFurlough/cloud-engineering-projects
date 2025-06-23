@@ -26,3 +26,5 @@ The IAM role "gitlab-cicd-execution-role" will need these policies attached:
 
 - `arn:aws:iam::aws:policy/AWSCloudFormationFullAccess`
 - `arn:aws:iam::aws:policy/AmazonS3FullAccess` (or whatever service the pipeline is deploying via cloudformation)
+
+Note that `grep` is used to parse the returned credentials json object because `jq` is not available in the `amazon/aws-cli` docker image
