@@ -1,0 +1,39 @@
+# Ignore environment variable files
+.env
+.env.*
+
+# Allow sample env files
+!.env.sample
+!.env.example
+
+# Ignore Docker-related files
+**/.DS_Store
+**/Thumbs.db
+docker-compose.override.yml  # optional, often used for local development
+docker-compose*.local.yml    # local-only compose overrides
+
+# Ignore Docker volumes or bind mounts (if mapped to local dirs)
+volume-data/
+db-data/
+node_modules/
+logs/
+tmp/
+
+# Python specific (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node.js specific (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VS Code settings
+.vscode/
+
+# OS-specific
+.DS_Store
+*.swp
