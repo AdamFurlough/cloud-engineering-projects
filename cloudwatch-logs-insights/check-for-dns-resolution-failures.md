@@ -10,7 +10,7 @@ Log group should contain network traffic from the private IP or ENI of the EC2 i
 
 ## Query
 
-```
+```sql
 fields @timestamp, queryName, responseCode, srcAddr
 | filter responseCode != 'NOERROR' and srcAddr like '10.50.'
 | sort @timestamp desc
